@@ -5,13 +5,16 @@ import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import { ptBR } from 'date-fns/locale';
 import { useRouter } from 'next/router';
 import Prismic from '@prismicio/client';
-import PrismicDom from 'prismic-dom';
 import Header from '../../components/Header';
+
+import React from 'react';
+import { useUtterances } from '../../hooks/useUtterances';
 
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
+import Link from 'next/link';
 interface Post {
   first_publication_date: string | null;
   data: {
@@ -30,9 +33,10 @@ interface Post {
 }
 interface PostProps {
   post: Post;
+  preview: boolean;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post, preview }: PostProps) {
   const totalWords = post.data.content.reduce((total, contentItem) => {
     total += contentItem.heading.split(' ').length;
 
@@ -55,6 +59,15 @@ export default function Post({ post }: PostProps) {
   if (router.isFallback) {
     return <h1>Carregando...</h1>;
   }
+
+  const commentNodeId = 'comments';
+  const theme = 'github-dark'
+
+  const Comments = () => {
+    useUtterances(commentNodeId, theme);
+    return <div id={commentNodeId} />;
+  };
+  
   return (
     <>
       <Header />
@@ -93,10 +106,20 @@ export default function Post({ post }: PostProps) {
             );
           })}
         </div>
+        <Comments />
+        {preview && (
+          <aside>
+            <Link href="/api/exit-preview">
+              <a className={commonStyles.preview}>Sair do modo Preview</a>
+            </Link>
+          </aside>
+        )}
       </main>
     </>
   );
 }
+
+
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient();
@@ -118,10 +141,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async context => {
+export const getStaticProps: GetStaticProps = async({params, preview = false, previewData}) => {
   const prismic = getPrismicClient();
-  const { slug } = context.params;
-  const response = await prismic.getByUID('posts', String(slug), {});
+  const { slug } = params;
+  const response = await prismic.getByUID('posts', String(slug), {
+    ref: previewData?.ref || null,
+  });
 
   const post = {
     uid: response.uid,
@@ -145,6 +170,8 @@ export const getStaticProps: GetStaticProps = async context => {
   return {
     props: {
       post,
+      preview
     },
+    revalidate: 1800
   };
 };
