@@ -11,7 +11,7 @@
 ## 💻 O que compõe o blog?
 
 * Uma interface simples, com todos os detalhes no [Figma](https://www.figma.com/file/0Y26j0tf1K2WB5c1ja5hov/Desafios-M%C3%B3dulo-3-ReactJS?node-id=0%3A1).
-* Foi integrado ao projeto a API do Prismic, para gerencias as postagens .
+* Foi integrado ao projeto a API do Prismic, para gerenciar as postagens .
 
 &nbsp;
 
