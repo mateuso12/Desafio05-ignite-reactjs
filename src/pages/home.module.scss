@@ -1,0 +1,48 @@
+.post {
+  margin-top: 2rem;
+
+    strong {
+      font-family: "Inter", sans-serif;
+      font-size: 1.75rem;
+      font-weight: bold;
+    }
+
+ > a {
+    display: block;
+
+    ul {
+      list-style: none;
+      display: flex;
+      gap: 1.75rem;
+      margin-top: 1.5rem;
+
+      li {
+        font-size: 0.875rem;
+      }
+
+      svg {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+
+  a + a {
+    margin-top: 3rem;
+  }
+
+  p {
+    margin-top: 0.5rem;
+    font-size: 1.125rem;
+  }
+
+  button {
+    border: none;
+    background: transparent;
+    color: var(--highlight);
+    margin-top:4rem;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1,36125rem;
+
+  }
+}
