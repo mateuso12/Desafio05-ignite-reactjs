@@ -27,7 +27,7 @@
 
 ## 📝 Licença
 
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo de  para detalhes.
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo de [licença](https://github.com/mateuso12/Desafio05-ignite-reactjs/commit/6110132d58feeb11dfcf60dc1187bfd435200eb5)  para detalhes.
 
 
 ---
