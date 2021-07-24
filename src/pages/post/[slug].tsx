@@ -1,16 +1,17 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import Head from 'next/head';
+import { format } from 'date-fns';
 import { RichText } from 'prismic-dom';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
+import { ptBR } from 'date-fns/locale';
+import { useRouter } from 'next/router';
+import Prismic from '@prismicio/client';
+import PrismicDom from 'prismic-dom';
+import Header from '../../components/Header';
 
 import { getPrismicClient } from '../../services/prismic';
-import Prismic from '@prismicio/client';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
-import { useRouter } from 'next/router';
-import Header from '../../components/Header';
-
 interface Post {
   first_publication_date: string | null;
   data: {
@@ -27,102 +28,123 @@ interface Post {
     }[];
   };
 }
-
 interface PostProps {
   post: Post;
 }
 
-export default function Post({post}: PostProps) {
+export default function Post({ post }: PostProps) {
+  const totalWords = post.data.content.reduce((total, contentItem) => {
+    total += contentItem.heading.split(' ').length;
+
+    const words = contentItem.body.map(item => item.text.split(' ').length);
+    words.map(word => (total += word));
+    return total;
+  }, 0);
+  const readTime = Math.ceil(totalWords / 200);
+
   const router = useRouter();
 
-  if(router.isFallback) {
-    return <div>Carregando...</div>
-  }
+  const formattedDate = format(
+    new Date(post.first_publication_date),
+    'dd MMM yyyy',
+    {
+      locale: ptBR,
+    }
+  );
 
+  if (router.isFallback) {
+    return <h1>Carregando...</h1>;
+  }
   return (
     <>
-    <Head>
-      <title> post.data.title | spacetraveling </title>
-    </Head>
-      <Header /> 
-      <img src="/images/imagem1.png" alt="banner" className={styles.banner}/>
+      <Header />
+      <img src={post.data.banner.url} alt="imagem" className={styles.banner} />
+      <main className={commonStyles.container}>
+        <div className={styles.post}>
+          <div className={styles.postTop}>
+            <h1>{post.data.title}</h1>
+            <ul>
+              <li>
+                <FiCalendar />
+                {formattedDate}
+              </li>
+              <li>
+                <FiUser />
+                {post.data.author}
+              </li>
+              <li>
+                <FiClock />
+                {`${readTime} min`}
+              </li>
+            </ul>
+          </div>
 
-    <main className={commonStyles.container}>
-      <div >
-        <div className={styles.postTop}>
-        <h1>post.data.title</h1>
-        <ul>
-          <li>
-            <FiCalendar />
-            23 Jul 2021
-          </li>
-          <li>
-            <FiUser />
-            Mateus Sousa
-          </li>
-          <li>
-            <FiClock />
-            4 min
-          </li>
-        </ul>
+          {post.data.content.map(content => {
+            return (
+              <article key={content.heading}>
+                <h2>{content.heading}</h2>
+                <div
+                  className={styles.postContent}
+                  dangerouslySetInnerHTML={{
+                    __html: RichText.asHtml(content.body),
+                  }}
+                />
+              </article>
+            );
+          })}
         </div>
-
-        <article className={styles.post}>
-          <h2>Titulo seção</h2>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat voluptatibus quisquam perspiciatis accusantium architecto cumque dolor enim corrupti sed! Atque totam odio recusandae iste unde sequi neque aliquam! Corrupti veniam ab animi rem itaque impedit similique ratione repudiandae, illo nobis est quis harum quos laudantium ea hic cum explicabo natus, nihil iusto deserunt illum? Animi quis aliquid rem neque nulla facere tempora, expedita commodi necessitatibus nemo illum ipsum obcaecati reprehenderit repellendus molestiae quae? Molestiae ut tenetur aliquid eum odio doloremque!</p>
-        </article>
-      </div>
-    </main>
+      </main>
     </>
-  )
+  );
 }
 
-// export const getStaticPaths = async () => {
-//   const prismic = getPrismicClient();
-//   const posts = await prismic.query([Prismic.Predicates.at('document.type', 'posts')]);
+export const getStaticPaths: GetStaticPaths = async () => {
+  const prismic = getPrismicClient();
+  const posts = await prismic.query([
+    Prismic.Predicates.at('document.type', 'posts'),
+  ]);
 
-//   const paths = posts.results.map(post => {
-//     return {
-//       params: {
-//         slug: post.uid
-//       }
-//     }
-//   })
+  const paths = posts.results.map(post => {
+    return {
+      params: {
+        slug: post.uid,
+      },
+    };
+  });
 
-//   return { 
-//     paths,
-//     fallback: true
-//   }
-// };
+  return {
+    paths,
+    fallback: true,
+  };
+};
 
-// export const getStaticProps = async ({params}) => {
-//   const { slug } = params;
+export const getStaticProps: GetStaticProps = async context => {
+  const prismic = getPrismicClient();
+  const { slug } = context.params;
+  const response = await prismic.getByUID('posts', String(slug), {});
 
-//   const prismic = getPrismicClient();
-//   const response = await prismic.getByUID('post', String(slug), {});
-//   const post = {
-//     uid: response.uid,
-//     first_publication_date: RichText.asText(response.first_publication_date),
-//     data: {
-//       title: RichText.asText(response.data.title),
-//       subtitle: RichText.asText(response.data.subtitle),
-//       author: RichText.asText(response.data.author),
-//       banner: {
-//         url: RichText.asText(response.data.banner.url),
-//       },
-//       content: RichText.asHtml(response.data.content).map(content => {
-//         return {
-//           heading: content.heading,
-//           body: [...content.body]
-//     }
-//       })
-//     }
-//   }
+  const post = {
+    uid: response.uid,
+    first_publication_date: response.first_publication_date,
+    data: {
+      title: response.data.title,
+      subtitle: response.data.subtitle,
+      author: response.data.author,
+      banner: {
+        url: response.data.banner.url,
+      },
+      content: response.data.content.map(content => {
+        return {
+          heading: content.heading,
+          body: [...content.body],
+        };
+      }),
+    },
+  };
 
-//   return { 
-//     props: {
-//       post
-//     },
-//     redirect: 60 * 30 //30 minutes
-//   }
-// };
+  return {
+    props: {
+      post,
+    },
+  };
+};

@@ -3,3 +3,19 @@
   margin: 0 auto;
   margin-top: 5rem;
 }
+
+.preview {
+  a {
+  display: flex;
+  height: 58px;
+  max-width: 700px;
+  background: var(--heading);
+  border-radius: 4px;
+  margin: 0 auto;
+  
+  font-size: 18px;
+  font-weight: 600;
+  justify-content: center;
+  align-items: center;
+  }
+}
