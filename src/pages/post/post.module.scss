@@ -4,6 +4,35 @@
   object-fit: cover;
 }
 
+.postTop{
+  margin-bottom: 4rem;
+  > h1 {
+    font-size:3rem;
+    color:var(--heading);
+    margin-bottom:1.5rem;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    gap: 1.625rem;
+
+     li {
+     display: flex;
+     align-items:center; 
+     font-size:0.875rem;
+     gap: 0.5rem;
+    }
+  }
+  span {
+    display: block;
+    margin-top: 1rem;
+    font-style: italic;
+    font-size: 0.875rem;
+    color:var(--info)
+  }
+}
+
 .post {
   h2{
     font-size:2.25rem;
@@ -11,7 +40,7 @@
     margin: 3rem 0;
   }
 
-  p, span, a, ul{
+  p, a, ul{
     font-size:1.125rem;
     line-height: 1.8;
     margin: 1.8rem 0;
@@ -26,41 +55,34 @@
     color:var(--body)
   }
 
-  ul {
-    padding-left: 1.5rem;
-
-    li {
-      margin: 0.5rem 0;
-    }
-  }
 }
 
-.postTop{
-  margin-bottom: 4rem;
-  > h1 {
-    font-size:3rem;
+.navigation {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-top: 1px solid #D7D7D7;
+
+  h3{
+    font-size:1.125rem;
+    font-weight: 400;
     color:var(--heading);
-    margin-bottom:1.5rem;
+    margin-bottom:0.5rem;
   }
 
-  > ul {
-    list-style: none;
-    display: flex;
-    gap: 1.625rem;
-
-     li {
-     display: flex;
-     align-items:center; 
-     font-size:0.875rem;
-     gap: 0.5rem;
-    }
+  a {
+    color:var(--highlight);
+    font-weight:600;
   }
 
-  > span {
-    margin-top: 1rem;
-    display:block;
-    font-style: italic;
-    font-size: 0.875rem;
-    color:var(--info)
+  div {
+    padding-top: 3rem;
+  }
+
+  div + div{
+    text-align: right;
+
   }
 }
+
+
